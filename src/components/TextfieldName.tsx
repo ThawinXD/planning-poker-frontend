@@ -1,14 +1,22 @@
+"use client";
 import { TextField } from "@mui/material";
+import { useEffect, useState } from "react";
 
 export default function TextfieldName(
-  { name, setName, submitName }: { name: string; setName: (name: string) => void; submitName: (name: string) => void }
+  { name, setName, submitName }: { name: string; setName: Function | null; submitName: (name: string) => void }
 ) {
+  const [inName, setInName] = useState<string>(name);
+
+  useEffect(() => {
+    setInName(name);
+  }, [name]);
+  
   return (
     <form
       className="my-4"
       onSubmit={(e) => {
         e.preventDefault();
-        submitName(name);
+        submitName(inName);
       }}
     >
       <TextField
@@ -20,9 +28,10 @@ export default function TextfieldName(
         sx={{
           backgroundColor: "white",
         }}
-        value={name}
+        value={inName}
         onChange={(e) => {
-          setName(e.target.value);
+          setName && setName(e.target.value);
+          setInName(e.target.value);
         }}
       />
     </form>

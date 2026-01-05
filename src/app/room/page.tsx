@@ -50,7 +50,7 @@ export default function RoomPage() {
         dispatch(setUserId(socket.id));
       console.log("Socket connected:", socket.id);
 
-      if (!user.name || user.name === "") {
+      if (!user || !user.name || user.name === "") {
         setShowNamePrompt(true);
         return;
       }
@@ -70,6 +70,7 @@ export default function RoomPage() {
           dispatch(setURL(roomId?`${window.location.origin}/room#${roomId}`:""));
         } else {
           console.error("Error joining room:", res.error);
+          console.log("Action code:", res.action);
           if (res.action === 0) {
             setShowNamePrompt(true);
           }
@@ -116,27 +117,6 @@ export default function RoomPage() {
     return () => clearTimeout(timer);
   }, [name, dispatch]);
 
-  useEffect(() => {
-    console.log("Room ID from URL hash:", roomId);
-    if (!roomId) {
-      // console.log("No room ID found in URL.");
-      // setShowAlert(true);
-      return;
-    }
-    if (user.name === "" || !user.name) {
-      setShowNamePrompt(true);
-    }
-
-    socket.emit("joinRoom", { roomId: roomId, user: user }, (res: IResRoom) => {
-      if (res.success) {
-        console.log("Joined room with ID:", roomId);
-      } else {
-        console.error("Error joining room:", res.error);
-        setShowAlert(true);
-      }
-    });
-  }, [roomId]);
-
   function submitName(e: string) {
     dispatch(setUserName(e));
     setShowNamePrompt(false);
@@ -158,7 +138,7 @@ export default function RoomPage() {
             </h1>
             <TextfieldName
               name={name}
-              setName={setName}
+              setName={() => {}}
               submitName={submitName}
             />
           </div>

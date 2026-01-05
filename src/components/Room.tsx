@@ -37,7 +37,7 @@ export default function RoomPageIn({ user, roomId }: { user: IUser; roomId: stri
         console.error("Error getting room data:", res.error);
       }
     });
-  }, [roomId]);
+  }, [roomId, user]);
 
   useEffect(() => {
     setTimeout(() => {
