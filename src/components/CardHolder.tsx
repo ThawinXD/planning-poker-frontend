@@ -17,10 +17,9 @@ export default function CardHolder(
     })
   );
 
-  useEffect(() => {
-    // console.log("Cards updated:");
-    // console.log(inCards);
-  }, [inCards]);
+  // useEffect(() => {
+  //   console.log("inCards updated:", inCards);
+  // }, [inCards]);
 
   useEffect(() => {
     if (!canVote) {
@@ -30,8 +29,11 @@ export default function CardHolder(
 
   // keep local cards in sync when parent prop changes
   useEffect(() => {
-    // console.log("init cards", cards);
-    setCards(cards);
+    // keep state from thrashing when parent re-renders with identical arrays
+    setCards((prev) => {
+      const sameOrder = prev.length === cards.length && prev.every((c, i) => c === cards[i]);
+      return sameOrder ? prev : cards;
+    });
   }, [cards]);
 
   function handleDragStart({ active }: DragStartEvent) {
@@ -46,6 +48,8 @@ export default function CardHolder(
       const oldIndex = cards.indexOf(active.id as string);
       const newIndex = cards.indexOf(over.id as string);
       const newOrder = arrayMove(cards, oldIndex, newIndex);
+      // console.log(oldIndex, newIndex);
+      // console.log("New card order:", newOrder);
       return newOrder;
     })
     setActiveId(null);
@@ -101,7 +105,7 @@ export default function CardHolder(
               inCards.map((c) => (
                 <Card
                   card={c}
-                  key={inCards.indexOf(c)}
+                  key={c}
                   canVote={canVote}
                   onSelectCard={() => {
                     if (!canVote) return;
