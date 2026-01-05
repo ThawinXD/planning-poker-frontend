@@ -54,6 +54,9 @@ export default function RoomPage() {
         setShowNamePrompt(true);
         return;
       }
+      else {
+        setShowNamePrompt(false);
+      }
 
       if (!roomId) {
         // console.error("No room ID found in URL.");
