@@ -1,5 +1,5 @@
 
-export default function Player({name, isVoted, cardPicked, x, y}: {name: string; isVoted: boolean; cardPicked: string | null; x: number; y: number}) {
+export default function Player({name, size, x, y}: {name: string; size: number; x: number; y: number}) {
   return (
     <div
       className="absolute flex flex-col items-center transition-all duration-300"
@@ -8,11 +8,24 @@ export default function Player({name, isVoted, cardPicked, x, y}: {name: string;
       }}
     >
       <div
-        className="w-12 h-12 flex items-center justify-center"
+        className="flex flex-col items-center justify-center"
+        style={{
+          width: size,
+          height: size,
+        }}
       >
         <img src="/avatar.svg" alt="Avatar" className="w-full h-full"/>
+        <p
+          style={{
+            marginTop: size * 0.1,
+            fontSize: size * 0.35,
+            whiteSpace: 'nowrap',
+            textAlign: 'center',
+          }}
+        >
+          {name}
+        </p>
       </div>
-      <p>{name}</p>
       {/* <p>{name} - {isVoted ? "Voted" : "Not Voted"} - {cardPicked || "No card picked"}</p> */}
     </div>
   )

@@ -287,7 +287,11 @@ export default function RoomPageIn({ user, roomId }: { user: IUser; roomId: stri
   }
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center space-y-4 p-4">
+    <div
+      id="room-in"
+      className="w-full h-full flex flex-col items-center justify-center space-y-4"
+    >
+      {/* <div className="h-[15vh]"> </div> */}
       {showSnackbar && (
         <Snackbar
           anchorOrigin={{ vertical: "top", horizontal: "center" }}

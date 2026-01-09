@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, DragStartEvent, DragEndEvent, useDroppable } from "@dnd-kit/core";
+import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, TouchSensor, DragStartEvent, DragEndEvent, useDroppable } from "@dnd-kit/core";
 import { arrayMove, SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 import Card from "./Card";
 
@@ -9,10 +9,17 @@ export default function CardHolder(
   const [inCards, setCards] = useState<string[]>(cards);
   const [selectedCard, setSelectedCard] = useState<string>("");
   const [activeId, setActiveId] = useState<string | null>(null);
+  
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 15,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
       },
     })
   );
@@ -79,15 +86,15 @@ export default function CardHolder(
   }
 
   return (
-    <div>
+    <div id="card-holder" className="w-full pb-4">
       {!showEditCards && !canVote && (
-        <p className="text-center text-gray-400 mb-4">Wait for the host to start the voting.</p>
+        <p className="text-center text-gray-400 pb-3">Wait for the host to start the voting.</p>
       )}
       {!showEditCards && canVote && (
-        <p className="text-center text-gray-400 mb-4">Select a card to vote.</p>
+        <p className="text-center text-gray-400 pb-3">Select a card to vote.</p>
       )}
       {showEditCards && (
-        <p className="text-center text-gray-400 mb-4">Drag and drop cards to reorder them. Edit card number by clicking on text and typing. Click "+" to add a new card.</p>
+        <p className="text-center text-gray-400 pb-3">Drag and drop cards to reorder them. Edit card number by clicking on text and typing. Click "+" to add a new card.</p>
       )}
       <DndContext
         sensors={sensors}
@@ -100,7 +107,7 @@ export default function CardHolder(
           strategy={horizontalListSortingStrategy}
           disabled={!showEditCards}
         >
-          <div className="flex flex-row flex-wrap gap-4 justify-center">
+          <div className="flex flex-row flex-wrap gap-4 justify-center w-full">
             {
               inCards.map((c) => (
                 <Card

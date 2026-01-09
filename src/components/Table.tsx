@@ -4,28 +4,42 @@ import { Button } from "@mui/material";
 import PlayerCard from "./playerCard";
 import { Fragment } from "react";
 import Result from "./Result";
+import useSize from "../lib/functions/useSize";
+import playerPosition from "../lib/functions/playerPosition";
 
 
 export default function Table(
   { users, estimations, canVote, isRevealed, showEditCards, voteResult, host, user, onStartVote, onRevealCards, onResetVote, onEditCards }: { users: IRoomUser[]; estimations: IEstimation[]; canVote: boolean; isRevealed: boolean; showEditCards: boolean; voteResult: IVoteResult | null; host: string; user: IUser; onStartVote: Function; onRevealCards: Function; onResetVote: Function; onEditCards: Function }
 ) {
+  const [ref, width, height] = useSize();
+  
+  const capsule = {
+    cx: width / 2,
+    cy: height / 2,
+    width: width * 0.60,
+    height: height * 0.60,
+  }
+
   const total = users.length;
-  const width = 600;
-  const height = 300;
-  const radius = height / 2;
-  const line = width - 2 * radius;
+  const radius = capsule.height / 2;
+  const line = capsule.width - 2 * radius;
   const perimeter = 2 * line + 2 * Math.PI * radius;
-  const gap = 45; // gap between circle and players
+  const gap = Math.min(width, height) * 0.1; // gap between circle and players
+  const playerSize = gap * 0.95;
 
   return (
-    <div className="flex items-center justify-center p-8 mt-8 mb-10">
+    <div
+      id="table"
+      ref={ref}
+      className="relative flex items-center justify-center w-full h-full"
+    >
       {
         user && user.name &&
         <div
-          className="relative rounded-full m-4 bg-blue-400 self-center mb-4 flex flex-col items-center justify-center"
+          className="absolute rounded-full m-4 bg-blue-400 self-center mb-4 flex flex-col items-center justify-center"
           style={{
-            width: width,
-            height: height,
+            width: capsule.width,
+            height: capsule.height,
           }}
         >
           <Result voteResult={voteResult} />
@@ -78,76 +92,28 @@ export default function Table(
             users.map((u, index) => {
               const userEstimation = estimations ? estimations.find(e => e.name === u.name) : null;
               const cardPicked = userEstimation ? userEstimation.vote : null;
-              let step = ((index + 1) * (perimeter / total) + (line / 2)) % perimeter;
 
-              let px = 0;
-              let py = 0;
-
-              let cx = 0;
-              let cy = 0;
-
-              let condition = false;
-
-              if (step <= line) {
-                // Top side
-                condition = true;
-                const x = -line / 2 + step;
-                const y = -radius;
-                px = x;
-                py = y - gap;
-                cx = x;
-                cy = y + gap;
-              }
-
-              if (!condition) step -= line;
-              if (!condition && step < Math.PI * radius) {
-                // Right curve
-                condition = true;
-                const angle = -Math.PI / 2 + step / radius;
-                const x = line / 2 + radius * Math.cos(angle);
-                const y = radius * Math.sin(angle);
-                px = x + Math.cos(angle) * gap;
-                py = y + Math.sin(angle) * gap;
-                cx = x - Math.cos(angle) * gap;
-                cy = y - Math.sin(angle) * gap;
-              }
-
-              if (!condition) step -= Math.PI * radius
-              if (!condition && step <= line) {
-                // Bottom side
-                condition = true;
-                const x = line / 2 - step;
-                const y = radius;
-                px = x;
-                py = y + gap;
-                cx = x;
-                cy = y - gap;
-              }
-
-              if (!condition) step -= line;
-              if (!condition) {
-                // Left curve
-                const angle = Math.PI / 2 + step / radius;
-                const x = -line / 2 + radius * Math.cos(angle);
-                const y = radius * Math.sin(angle);
-                px = x + Math.cos(angle) * gap;
-                py = y + Math.sin(angle) * gap;
-                cx = x - Math.cos(angle) * gap;
-                cy = y - Math.sin(angle) * gap;
-              }
+              const { px, py, cx, cy } = playerPosition(
+                index,
+                total,
+                radius,
+                line,
+                gap,
+                perimeter,
+              );
 
               return (
                 <Fragment key={u.name}>
                   <Player
                     name={u.name}
-                    isVoted={u.isVoted}
-                    cardPicked={isRevealed ? cardPicked : null}
+                    size={playerSize}
                     x={px}
                     y={py}
                   />
                   <PlayerCard
                     x={cx}
                     y={cy}
+                    size={playerSize}
                     isVoted={u.isVoted}
                     cardPicked={isRevealed ? cardPicked : null}
                   />
