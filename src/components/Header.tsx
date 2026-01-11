@@ -38,8 +38,11 @@ export default function Header() {
   return (
     <header className="bg-blue-400 relative top-0 left-0 w-full h-[15vh]">
       <div className="bg-blue-400 flex flex-row w-full h-full">
-        <div className="ml-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-white">Poker Planning Tool</h1>
+        <div className={`
+          flex flex-col justify-center
+          ${!url ? "sm:ml-10 md:ml-16 xl:ml-32" : "ml-auto"}
+        `}>
+          <h1 className="text-center text-3xl font-bold text-white">Poker Planning Tool</h1>
           <div className="mt-2 text-gray-100">
             {user ? `Display name: ${user.name}` : "Not logged in"}
           </div>

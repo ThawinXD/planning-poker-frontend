@@ -107,7 +107,7 @@ export default function CardHolder(
           strategy={horizontalListSortingStrategy}
           disabled={!showEditCards}
         >
-          <div className="flex flex-row flex-wrap gap-4 justify-center w-full">
+          <div className="flex flex-row flex-wrap gap-4 justify-center w-full touch-none">
             {
               inCards.map((c) => (
                 <Card
@@ -139,13 +139,13 @@ export default function CardHolder(
             )}
             {showEditCards && (
               <div
-                className="w-16 h-24 flex items-center justify-center rounded-lg outline-2 outline-white outline-dashed relative hover:scale-105 cursor-pointer"
+                className="w-16 h-24 flex items-center justify-center rounded-lg outline-2 dark:outline-white outline-black outline-dashed relative hover:scale-105 cursor-pointer"
                 onClick={(e) => {
                   e.preventDefault();
                   setCards(cards);
                 }}
               >
-                <span className="text-4xl text-white select-none">↻</span>
+                <span className="text-4xl dark:text-white text-black select-none">↻</span>
               </div>
             )}
             {showEditCards && (

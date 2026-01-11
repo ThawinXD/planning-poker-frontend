@@ -16,7 +16,7 @@ export default function Table(
   const capsule = {
     cx: width / 2,
     cy: height / 2,
-    width: width * 0.60,
+    width: width < height ? width * 0.60 : width * 0.40,
     height: height * 0.60,
   }
 
