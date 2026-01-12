@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Button, TextField } from "@mui/material"
+import { Button, IconButton, InputBase, Paper, TextField } from "@mui/material"
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IResRoom, IUser } from "@/interfaces";
@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { setUserId, setUserName as setUserNameAction, setURL } from "../lib/features/user";
 import socket from "../socket";
 import TextfieldName from "../components/TextfieldName";
+import { Direction } from "@dnd-kit/core/dist/types";
 
 export default function Home() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function Home() {
   const [userName, setUserName] = useState<string>("");
   const [isSocketConnected, setIsSocketConnected] = useState<boolean>(false);
   const [showJoinRoomInput, setShowJoinRoomInput] = useState<boolean>(false);
+  const [roomInput, setRoomInput] = useState<string>("");
 
   useEffect(() => {
     function onConnect() {
@@ -66,7 +68,7 @@ export default function Home() {
     socket.emit("createRoom", user, (res: IResRoom) => {
       if (res.success) {
         console.log("Room created with ID:", res.roomId);
-        dispatch(setURL(res.roomId?`${window.location.origin}/room#${res.roomId}`:""));
+        dispatch(setURL(res.roomId ? `${window.location.origin}/room#${res.roomId}` : ""));
         router.push(`/room#${res.roomId}`);
       } else {
         console.error("Error creating room:", res.error);
@@ -74,8 +76,27 @@ export default function Home() {
     });
   }
 
-  function handleJoinRoom() {
+  function handleJoinRoom(input: string) {
     console.log("Join room button clicked");
+    let roomId = input.trim();
+    
+    // If input is a URL, extract the room ID from the URL
+    try {
+      const url = new URL(roomId);
+      roomId = url.hash.substring(1); // Remove the '#' character
+    } catch (e) {
+      // Not a valid URL, assume it's a room ID
+    }
+    if (roomId) {
+      dispatch(setURL(`${window.location.origin}/room#${roomId}`));
+      router.push(`/room#${roomId}`);
+    } else {
+      alert("Invalid room ID or URL");
+    }
+  }
+
+  function handleButtonJoinRoom() {
+    setShowJoinRoomInput(!showJoinRoomInput);
   }
 
 
@@ -97,6 +118,24 @@ export default function Home() {
         setName={setUserName}
         submitName={submitName}
       />
+      {
+        showJoinRoomInput &&
+        <Paper
+          component="form"
+          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 300}}
+        >
+          <InputBase
+            sx={{ ml: 1, flex: 1 }}
+            placeholder="Enter room code or URL"
+            inputProps={{ 'aria-label': 'enter room code or URL' }}
+            value={roomInput}
+            onChange={(e) => setRoomInput(e.target.value)}
+          />
+          <IconButton color="primary" sx={{ p: '10px' }} aria-label="directions" onClick={() => handleJoinRoom(roomInput)}>
+            <Image src="/direction_right.svg" alt="Join Room" width={24} height={24} />
+          </IconButton>
+        </Paper>
+      }
       <div className="my-8 flex flex-row p-4 gap-4">
         <Button
           variant="contained"
@@ -112,7 +151,7 @@ export default function Home() {
           variant="outlined"
           onClick={(e) => {
             e.preventDefault();
-            handleJoinRoom();
+            handleButtonJoinRoom();
           }}
           disabled={userName.trim() === ""}
         >
